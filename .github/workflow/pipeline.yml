@@ -1,0 +1,243 @@
+name: CICD
+on:
+  push
+
+jobs:
+  # hello_world:
+  #   name: print Hello World
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./Backend
+  #       shell: bash
+  #   steps:
+  #     - uses: actions/checkout@v2
+    
+  #     - name: print Hello World
+  #       run: echo "Hello World!"
+
+  #     - name: print Secret
+  #       run: echo ${{secrets.MY_SECRET}}
+
+  #     - name: run sh
+  #       run: chmod +x ./Run.sh
+        
+  #     - name: execute Run.sh
+  #       run: ./Run.sh
+
+  #     - name: executing remote ssh commands using password
+  #       uses: appleboy/scp-action@master
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         password: ${{ secrets.PASSWORD }}
+  #         port: 22
+  #         source: ./Backend/Run.sh
+  #         target: ./
+          
+  #     - name: executing remote ssh commands using password
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         password: ${{ secrets.PASSWORD }}
+  #         port: 22
+  #         script: ./Run.sh
+
+  test:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Backend
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '18'
+          cache: 'gradle'
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew test
+        
+  #sonarqube:
+  #  name: Sonar
+  #  runs-on: ubuntu-latest
+  #  defaults:
+  #    run:
+  #      working-directory: ./Backend
+  #      shell: bash
+  #  steps:
+    
+  #    - uses: actions/checkout@v2
+      
+  #    - name: Set up JDK 18
+  #      uses: actions/setup-java@v3
+  #      with:
+  #        distribution: 'temurin'
+  #        java-version: '18'
+  #        cache: 'gradle'
+    
+  #    - name: Change permision for sonar
+  #      run: chmod +x ./gradlew
+    
+  #    - name: sonar test
+  #      run: ./gradlew sonarqube --info -Dsonar.projectKey=uk223 -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        
+  CreateImageBE:
+    name: Backend image
+    runs-on: ubuntu-latest
+    if: success()
+    needs: [test]
+    defaults:
+      run:
+        working-directory: ./Backend
+        shell: bash
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./Backend
+          file: ./Backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
+          
+  CreateImageFE:
+    name: Frontend image
+    runs-on: ubuntu-latest
+    if: success()
+    needs: [test]
+    defaults:
+      run:
+        working-directory: ./frontend
+        shell: bash
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+          
+ # PushOnLocalRegistry:
+   # name: Push on local regitry
+   # runs-on: ubuntu-latest
+   # if: success()
+   # needs: [PushOnLocalRegistry]
+   # steps:
+     # - name: Checkout
+       # uses: actions/checkout@v3
+        
+     # - name: executing remote ssh commands using password
+       # uses: appleboy/ssh-action@master
+       # with:
+         # host: ${{ secrets.HOST }}
+         # username: ${{ secrets.USERNAME }}
+         # password: ${{ secrets.PASSWORD }}
+         # port: 22
+         # script: |
+          #      docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
+           #     docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+            #    docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest 213.167.227.84:5000/backend:latest
+             #   docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest 213.167.227.84:5000/frontend:latest
+              #  docker push 213.167.227.84:5000/frontend:latest
+               # docker push 213.167.227.84:5000/backend:latest
+    
+  # DeployOnServer:
+  #   name: Deploy to server
+  #   runs-on: ubuntu-latest
+  #   if: success()
+  #   needs: [CreateImageFE, CreateImageBE]
+  #   steps:
+    
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+        
+  #     - name: Coping docker-compose file
+  #       uses: appleboy/scp-action@master
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         password: ${{ secrets.PASSWORD }}
+  #         port: 22
+  #         source: ./docker-compose.yml
+  #         target: .
+      
+  #     - name: executing remote ssh commands using password
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.HOST }}
+  #         username: ${{ secrets.USERNAME }}
+  #         password: ${{ secrets.PASSWORD }}
+  #         port: 22
+  #         script: |
+  #               docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
+  #               docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
+  #               docker-compose up -d --force-recreate
+                
+  # health-check:
+  #   name: Health Checks
+  #   runs-on: ubuntu-latest
+  #   if: success()
+  #   needs: [DeployOnServer]
+  #   steps:
+  #     - name: Check the deployed service URL
+  #       uses: jtalk/url-health-check-action@v3
+  #       with:
+  #         # Check the following URLs one by one sequentially
+  #         url: http://luk.dev.noseryoung.ch/
+  #         # Follow redirects, or just report success on 3xx status codes
+  #         follow-redirect: false # Optional, defaults to "false"
+  #         # Fail this action after this many failed attempts
+  #         max-attempts: 3 # Optional, defaults to 1
+  #         # Delay between retries
+  #         retry-delay: 5s # Optional, only applicable to max-attempts > 1
+  #         # Retry all errors, including 404. This option might trigger curl upgrade.
+  #         retry-all: false # Optional, defaults to "false"
+                
+  automated-api-tests:
+    name: Postman tests
+    runs-on: ubuntu-latest
+    if: success()
+    needs: [CreateImageFE, CreateImageBE]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Run API tests
+        run: |
+          postman collection run "24583422-f212a08c-975a-4fca-b18b-aa14202bf9f5" -e "24583422-a08e82ed-5781-475d-986b-8d59fc88e428"
