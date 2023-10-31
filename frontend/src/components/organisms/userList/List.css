@@ -1,0 +1,9 @@
+.list{
+    height: 90%;
+    flex-grow: 1;
+    position: fixed;
+    margin-bottom: 0;
+    margin-top: 7%;
+    width: 99%;
+    margin-left: 1%;
+}
