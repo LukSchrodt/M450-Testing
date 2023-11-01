@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyListEntryServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.domain.myListEntry</a> &gt; <span class="el_source">MyListEntryServiceImpl.java</span></div><h1>MyListEntryServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.demo.domain.myListEntry;
+
+import com.example.demo.core.generic.ExtendedServiceImpl;
+import com.example.demo.domain.myListEntry.dto.Priority;
+import com.example.demo.domain.user.User;
+import com.example.demo.domain.user.UserService;
+import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.ReadOnlyProperty;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
+<span class="fc" id="L21">@Log4j2</span>
+@Service
+public class MyListEntryServiceImpl extends ExtendedServiceImpl&lt;MyListEntry&gt; implements MyListEntryService {
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    public MyListEntryServiceImpl(MyListEntryRepository repository, Logger logger){
+<span class="fc" id="L29">        super(repository, logger);</span>
+<span class="fc" id="L30">    }</span>
+
+    @Override
+    @ReadOnlyProperty
+    public MyListEntry getById(UUID id){
+<span class="nc" id="L35">            return repository.findById(id).orElseThrow(() -&gt; new NoSuchElementException(&quot;No Element with the given ID&quot;));</span>
+    }
+
+    @Override
+    @ReadOnlyProperty
+    public List&lt;MyListEntry&gt; getByPriority(String priority){
+<span class="nc" id="L41">        priority = priority.toUpperCase();</span>
+        List&lt;MyListEntry&gt; entries;
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (priority.equals(&quot;HIGH&quot;)){entries = ((MyListEntryRepository) repository).findByPriority(Priority.HIGH);}</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        else if (priority.equals(&quot;MEDIUM&quot;)){entries = ((MyListEntryRepository) repository).findByPriority(Priority.MEDIUM);}</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        else if (priority.equals(&quot;LOW&quot;)){entries = ((MyListEntryRepository) repository).findByPriority(Priority.LOW);}</span>
+<span class="nc" id="L46">        else {entries = repository.findAll();}</span>
+<span class="nc" id="L47">        return entries;</span>
+    }
+
+    @Override
+    @ReadOnlyProperty
+    public List&lt;MyListEntry&gt; getSortedByPriority(){
+<span class="nc" id="L53">        List&lt;MyListEntry&gt; entryListH = getByPriority(&quot;HIGH&quot;);</span>
+<span class="nc" id="L54">        List&lt;MyListEntry&gt; entryListM = getByPriority(&quot;MEDIUM&quot;);</span>
+<span class="nc" id="L55">        List&lt;MyListEntry&gt; entryListL = getByPriority(&quot;LOW&quot;);</span>
+<span class="nc" id="L56">        entryListH.addAll(entryListM);</span>
+<span class="nc" id="L57">        entryListH.addAll(entryListL);</span>
+
+<span class="nc" id="L59">        log.debug(&quot;Oderded list:&quot; + entryListH);</span>
+
+<span class="nc" id="L61">        return entryListH;</span>
+    }
+
+    @Override
+    @ReadOnlyProperty
+    public List&lt;MyListEntry&gt; findAllByUser(){
+<span class="nc" id="L67">        User user = getCurrentUser();</span>
+<span class="nc" id="L68">        return((MyListEntryRepository) repository).findByUser(user);</span>
+    }
+
+    @Override
+    public MyListEntry createEntryList(MyListEntry myListEntry){
+<span class="nc" id="L73">        myListEntry.setUser(getCurrentUser());</span>
+<span class="nc" id="L74">        myListEntry.setDate(LocalDate.now());</span>
+<span class="nc" id="L75">        return repository.save(myListEntry);</span>
+    }
+
+    @Override
+    @Transactional
+    public MyListEntry updateById(UUID id, MyListEntry myListEntry){
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (repository.existsById(id)) {</span>
+<span class="nc" id="L83">                MyListEntry entryList = repository.findById(id).get();</span>
+<span class="nc" id="L84">                entryList.setPriority(myListEntry.getPriority());</span>
+<span class="nc" id="L85">                entryList.setText(myListEntry.getText());</span>
+<span class="nc" id="L86">                entryList.setTitle(myListEntry.getTitle());</span>
+<span class="nc" id="L87">                return repository.save(entryList);</span>
+            } else {
+<span class="nc" id="L89">                myListEntry.setUser(getCurrentUser());</span>
+<span class="nc" id="L90">                myListEntry.setDate(LocalDate.now());</span>
+<span class="nc" id="L91">                return repository.save(myListEntry);</span>
+            }
+    }
+
+    @Override
+    public Void deleteById(UUID id) {
+<span class="nc" id="L97">        return super.deleteById(id);</span>
+    }
+
+    @Override
+    public User getCurrentUser() {
+<span class="nc" id="L102">        Authentication auth = SecurityContextHolder.getContext().getAuthentication();</span>
+
+<span class="nc" id="L104">        log.info(&quot;Attempting to find User with Email: {}&quot;, auth.getName());</span>
+<span class="nc" id="L105">        User user = userService.getByEmail(auth.getName());</span>
+<span class="nc" id="L106">        log.info(&quot;Found User {} with Email {}&quot;, user, auth.getName());</span>
+
+<span class="nc" id="L108">        return user;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

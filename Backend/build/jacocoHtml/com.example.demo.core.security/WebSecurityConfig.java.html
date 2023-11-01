@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.core.security</a> &gt; <span class="el_source">WebSecurityConfig.java</span></div><h1>WebSecurityConfig.java</h1><pre class="source lang-java linenums">package com.example.demo.core.security;
+
+import com.example.demo.core.security.helpers.JwtProperties;
+import com.example.demo.domain.user.UserService;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+@Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
+
+  private final UserService userService;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtProperties jwtProperties;
+
+  @Autowired
+<span class="fc" id="L33">  public WebSecurityConfig(UserService userService, PasswordEncoder passwordEncoder, JwtProperties jwtProperties) {</span>
+<span class="fc" id="L34">    this.userService = userService;</span>
+<span class="fc" id="L35">    this.passwordEncoder = passwordEncoder;</span>
+<span class="fc" id="L36">    this.jwtProperties = jwtProperties;</span>
+<span class="fc" id="L37">  }</span>
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L41">    return http.authorizeRequests(requests -&gt; requests.antMatchers(HttpMethod.POST, &quot;/user/login&quot;, &quot;/user/register&quot;)</span>
+<span class="fc" id="L42">                                                      .permitAll()</span>
+<span class="fc" id="L43">                                                      .antMatchers(&quot;/v3/api-docs&quot;,&quot;/v3/api-docs/swagger-config&quot;,&quot;/swagger-ui/*&quot;).permitAll()</span>
+<span class="fc" id="L44">                                                      .anyRequest()</span>
+<span class="fc" id="L45">                                                      .authenticated())</span>
+<span class="fc" id="L46">               .addFilterAfter(new JWTAuthenticationFilter(new AntPathRequestMatcher(&quot;/user/login&quot;, &quot;POST&quot;),</span>
+<span class="fc" id="L47">                   authenticationManager(), jwtProperties), UsernamePasswordAuthenticationFilter.class)</span>
+<span class="fc" id="L48">               .addFilterAfter(new JWTAuthorizationFilter(userService, jwtProperties),</span>
+                   UsernamePasswordAuthenticationFilter.class)
+<span class="fc" id="L50">               .sessionManagement()</span>
+<span class="fc" id="L51">               .sessionCreationPolicy(SessionCreationPolicy.STATELESS)</span>
+<span class="fc" id="L52">               .and()</span>
+<span class="fc" id="L53">               .cors()</span>
+<span class="fc" id="L54">               .configurationSource(corsConfigurationSource())</span>
+<span class="fc" id="L55">               .and()</span>
+<span class="fc" id="L56">               .csrf()</span>
+<span class="fc" id="L57">               .disable()</span>
+<span class="fc" id="L58">               .build();</span>
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+<span class="fc" id="L63">    CorsConfiguration configuration = new CorsConfiguration();</span>
+<span class="fc" id="L64">    configuration.setAllowedOrigins(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L65">    configuration.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;));</span>
+<span class="fc" id="L66">    configuration.setAllowedHeaders(List.of(&quot;Authorization&quot;, &quot;Cache-Control&quot;, &quot;Content-Type&quot;));</span>
+<span class="fc" id="L67">    configuration.setExposedHeaders(List.of(&quot;Authorization&quot;));</span>
+
+<span class="fc" id="L69">    UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L70">    configurationSource.registerCorsConfiguration(&quot;/**&quot;, configuration);</span>
+
+<span class="fc" id="L72">    return configurationSource;</span>
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager() {
+<span class="fc" id="L77">    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();</span>
+<span class="fc" id="L78">    provider.setPasswordEncoder(passwordEncoder);</span>
+<span class="fc" id="L79">    provider.setUserDetailsService(userService);</span>
+<span class="fc" id="L80">    return new ProviderManager(provider);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

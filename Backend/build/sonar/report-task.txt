@@ -1,0 +1,6 @@
+projectKey=uk223
+serverUrl=https://sonarqube.noseryoung.ch
+serverVersion=9.7.1.62043
+dashboardUrl=https://sonarqube.noseryoung.ch/dashboard?id=uk223
+ceTaskId=AYSoi50jvMPsoIlLNYNi
+ceTaskUrl=https://sonarqube.noseryoung.ch/api/ce/task?id=AYSoi50jvMPsoIlLNYNi

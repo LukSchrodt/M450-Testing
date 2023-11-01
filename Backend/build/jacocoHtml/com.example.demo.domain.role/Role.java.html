@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Role.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.domain.role</a> &gt; <span class="el_source">Role.java</span></div><h1>Role.java</h1><pre class="source lang-java linenums">package com.example.demo.domain.role;
+
+import com.example.demo.core.generic.ExtendedEntity;
+import com.example.demo.domain.authority.Authority;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = &quot;role&quot;)
+public class Role extends ExtendedEntity {
+
+  @Column(name = &quot;name&quot;, nullable = false, unique = true)
+  private String name;
+
+<span class="pc" id="L23">  @ManyToMany(fetch = FetchType.EAGER)</span>
+  @JoinTable(name = &quot;role_authority&quot;, joinColumns = @JoinColumn(name = &quot;role_id&quot;, referencedColumnName = &quot;id&quot;),
+             inverseJoinColumns = @JoinColumn(name = &quot;authority_id&quot;, referencedColumnName = &quot;id&quot;))
+  private Set&lt;Authority&gt; authorities = new HashSet&lt;&gt;();
+
+<span class="fc" id="L28">  public Role() {</span>
+<span class="fc" id="L29">  }</span>
+
+  public Role(UUID id, String name, Set&lt;Authority&gt; authorities) {
+<span class="nc" id="L32">    super(id);</span>
+<span class="nc" id="L33">    this.name = name;</span>
+<span class="nc" id="L34">    this.authorities = authorities;</span>
+<span class="nc" id="L35">  }</span>
+
+  public String getName() {
+<span class="nc" id="L38">    return name;</span>
+  }
+
+  public Role setName(String name) {
+<span class="nc" id="L42">    this.name = name;</span>
+<span class="nc" id="L43">    return this;</span>
+  }
+
+  public Set&lt;Authority&gt; getAuthorities() {
+<span class="nc" id="L47">    return authorities;</span>
+  }
+
+  public Role setAuthorities(Set&lt;Authority&gt; authorities) {
+<span class="nc" id="L51">    this.authorities = authorities;</span>
+<span class="nc" id="L52">    return this;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
