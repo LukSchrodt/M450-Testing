@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyListEntryDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.domain.myListEntry.dto</a> &gt; <span class="el_source">MyListEntryDTO.java</span></div><h1>MyListEntryDTO.java</h1><pre class="source lang-java linenums">package com.example.demo.domain.myListEntry.dto;
+
+import com.example.demo.core.generic.ExtendedDTO;
+import com.example.demo.domain.user.User;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+public class MyListEntryDTO extends ExtendedDTO {
+    private String title;
+
+    private String text;
+
+    private Priority priority;
+
+<span class="nc" id="L16">    public MyListEntryDTO(){</span>
+<span class="nc" id="L17">    }</span>
+
+    public MyListEntryDTO(UUID id, String title, String text,Priority priority) {
+<span class="nc" id="L20">        super(id);</span>
+<span class="nc" id="L21">        this.title = title;</span>
+<span class="nc" id="L22">        this.text = text;</span>
+<span class="nc" id="L23">        this.priority = priority;</span>
+<span class="nc" id="L24">    }</span>
+
+    public String getTitle() {
+<span class="nc" id="L27">        return title;</span>
+    }
+
+    public void setTitle(String title) {
+<span class="nc" id="L31">        this.title = title;</span>
+<span class="nc" id="L32">    }</span>
+
+    public String getText() {
+<span class="nc" id="L35">        return text;</span>
+    }
+
+    public void setText(String text) {
+<span class="nc" id="L39">        this.text = text;</span>
+<span class="nc" id="L40">    }</span>
+
+    public Priority getPriority() {
+<span class="nc" id="L43">        return priority;</span>
+    }
+
+    public void setPriority(Priority priority) {
+<span class="nc" id="L47">        this.priority = priority;</span>
+<span class="nc" id="L48">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
