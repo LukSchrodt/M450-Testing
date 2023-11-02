@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyListEntryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.domain.myListEntry</a> &gt; <span class="el_source">MyListEntryController.java</span></div><h1>MyListEntryController.java</h1><pre class="source lang-java linenums">package com.example.demo.domain.myListEntry;
+
+import com.example.demo.domain.myListEntry.dto.MyListEntryDTO;
+import com.example.demo.domain.myListEntry.dto.MyListEntryMapper;
+import com.example.demo.domain.myListEntry.dto.Priority;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.UUID;
+
+@Validated
+@RestController
+@RequestMapping(&quot;/my_lists&quot;)
+<span class="fc" id="L21">@Log4j2</span>
+public class MyListEntryController {
+
+    MyListEntryService myListEntryService;
+    MyListEntryMapper myListEntryMapper;
+
+    @Autowired
+<span class="fc" id="L28">    public MyListEntryController(MyListEntryService myListEntryService, MyListEntryMapper myListEntryMapper) {</span>
+<span class="fc" id="L29">        this.myListEntryService = myListEntryService;</span>
+<span class="fc" id="L30">        this.myListEntryMapper = myListEntryMapper;</span>
+<span class="fc" id="L31">    }</span>
+
+    @GetMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_READ')&quot;)
+    public ResponseEntity&lt;MyListEntry&gt; getById(@PathVariable UUID id) {
+<span class="nc" id="L36">        return new ResponseEntity&lt;&gt;(myListEntryService.getById(id), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(&quot;/priority/{priority}&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_READ')&quot;)
+    public ResponseEntity&lt;List&lt;MyListEntry&gt;&gt; getByPriority(@PathVariable String priority) {
+<span class="nc" id="L42">        return new ResponseEntity&lt;&gt;(myListEntryService.getByPriority(priority), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(&quot;/&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_READ')&quot;)
+    public ResponseEntity&lt;List&lt;MyListEntry&gt;&gt; getAll() {
+<span class="nc" id="L48">        return new ResponseEntity&lt;&gt;(myListEntryService.findAll(), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(&quot;/mylist&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_READ')&quot;)
+    public ResponseEntity&lt;List&lt;MyListEntry&gt;&gt; getAllByUser() {
+<span class="nc" id="L54">        return new ResponseEntity&lt;&gt;(myListEntryService.findAllByUser(), HttpStatus.OK);</span>
+    }
+
+    @GetMapping(&quot;/sorted&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_READ')&quot;)
+    public ResponseEntity&lt;List&lt;MyListEntry&gt;&gt; getAllSorted() {
+<span class="nc" id="L60">        return new ResponseEntity&lt;&gt;(myListEntryService.getSortedByPriority(), HttpStatus.OK);</span>
+    }
+
+    @PostMapping(&quot;/&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_CREATE')&quot;)
+    public ResponseEntity&lt;MyListEntry&gt; createEntryList(@Valid @RequestBody MyListEntryDTO myListEntryDTO){
+<span class="nc" id="L66">        MyListEntry myListEntry = myListEntryMapper.fromDTO(myListEntryDTO);</span>
+<span class="nc" id="L67">        return new ResponseEntity&lt;&gt;(myListEntryService.createEntryList(myListEntry), HttpStatus.OK);</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_MODIFY') &amp;&amp;  @userPermissionEvaluator.isUserOwner(#id)&quot;)
+    public ResponseEntity&lt;MyListEntry&gt; updateEntryList(@PathVariable UUID id, @Valid @RequestBody MyListEntryDTO myListEntryDTO) {
+<span class="nc" id="L73">        MyListEntry myListEntry = myListEntryMapper.fromDTO(myListEntryDTO);</span>
+<span class="nc" id="L74">        return new ResponseEntity&lt;&gt;(myListEntryService.updateById(id, myListEntry), HttpStatus.OK);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasAuthority('MY_LIST_ENTRY_DELETE') &amp;&amp;  @userPermissionEvaluator.isUserOwner(#id)&quot;)
+    public ResponseEntity&lt;Void&gt; deleteById(@PathVariable UUID id) {
+<span class="nc" id="L80">        myListEntryService.deleteById(id);</span>
+<span class="nc" id="L81">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
