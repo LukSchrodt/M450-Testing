@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExtendedServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.core.generic</a> &gt; <span class="el_source">ExtendedServiceImpl.java</span></div><h1>ExtendedServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.demo.core.generic;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+public abstract class ExtendedServiceImpl&lt;T extends ExtendedEntity&gt; implements ExtendedService&lt;T&gt; {
+
+  protected final ExtendedRepository&lt;T&gt; repository;
+  protected final Logger logger;
+
+<span class="fc" id="L17">  protected ExtendedServiceImpl(ExtendedRepository&lt;T&gt; repository, Logger logger) {</span>
+<span class="fc" id="L18">    this.repository = repository;</span>
+<span class="fc" id="L19">    this.logger = logger;</span>
+<span class="fc" id="L20">  }</span>
+
+  @Override
+  public T save(T entity) {
+<span class="nc" id="L24">    return repository.save(entity);</span>
+  }
+
+  @Override
+  public Void deleteById(UUID id) throws NoSuchElementException {
+<span class="nc bnc" id="L29" title="All 2 branches missed.">    if (repository.existsById(id)) {</span>
+<span class="nc" id="L30">      repository.deleteById(id);</span>
+    } else {
+<span class="nc" id="L32">      throw new NoSuchElementException(String.format(&quot;Entity with ID '%s' could not be found&quot;, id));</span>
+    }
+<span class="nc" id="L34">    return null;</span>
+  }
+
+  @Override
+  public T updateById(UUID id, T entity) throws NoSuchElementException {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">    if (repository.existsById(id)) {</span>
+<span class="nc" id="L40">      entity.setId(id);</span>
+<span class="nc" id="L41">      return repository.save(entity);</span>
+    } else {
+<span class="nc" id="L43">      throw new NoSuchElementException(String.format(&quot;Entity with ID '%s' could not be found&quot;, id));</span>
+    }
+  }
+
+  @Override
+  public List&lt;T&gt; findAll() {
+<span class="nc" id="L49">    return repository.findAll();</span>
+  }
+
+  @Override
+  public List&lt;T&gt; findAll(Pageable pageable) {
+<span class="nc" id="L54">    Page&lt;T&gt; pagedResult = repository.findAll(pageable);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">    return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList&lt;T&gt;();</span>
+  }
+
+  @Override
+  public T findById(UUID id) {
+<span class="nc" id="L60">    return findOrThrow(repository.findById(id));</span>
+  }
+
+  @Override
+  public boolean existsById(UUID id) {
+<span class="nc" id="L65">    return repository.existsById(id);</span>
+  }
+
+  @Override
+  public T findOrThrow(Optional&lt;T&gt; optional) throws NoSuchElementException {
+<span class="nc bnc" id="L70" title="All 2 branches missed.">    if (optional.isPresent()) {</span>
+<span class="nc" id="L71">      return optional.get();</span>
+    } else {
+<span class="nc" id="L73">      throw new NoSuchElementException(&quot;No value present&quot;);</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

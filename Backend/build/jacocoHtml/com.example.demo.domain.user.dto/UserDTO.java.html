@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo</a> &gt; <a href="index.source.html" class="el_package">com.example.demo.domain.user.dto</a> &gt; <span class="el_source">UserDTO.java</span></div><h1>UserDTO.java</h1><pre class="source lang-java linenums">package com.example.demo.domain.user.dto;
+
+import com.example.demo.core.generic.ExtendedDTO;
+import com.example.demo.domain.role.dto.RoleDTO;
+import java.util.Set;
+import java.util.UUID;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+
+public class UserDTO extends ExtendedDTO {
+
+  private String firstName;
+
+  private String lastName;
+
+  @Email
+  private String email;
+
+  @Valid
+  private Set&lt;RoleDTO&gt; roles;
+
+<span class="nc" id="L22">  public UserDTO() {</span>
+<span class="nc" id="L23">  }</span>
+
+  public UserDTO(UUID id, String firstName, String lastName, String email, Set&lt;RoleDTO&gt; roles) {
+<span class="nc" id="L26">    super(id);</span>
+<span class="nc" id="L27">    this.firstName = firstName;</span>
+<span class="nc" id="L28">    this.lastName = lastName;</span>
+<span class="nc" id="L29">    this.email = email;</span>
+<span class="nc" id="L30">    this.roles = roles;</span>
+<span class="nc" id="L31">  }</span>
+
+  public String getFirstName() {
+<span class="nc" id="L34">    return firstName;</span>
+  }
+
+  public UserDTO setFirstName(String firstName) {
+<span class="nc" id="L38">    this.firstName = firstName;</span>
+<span class="nc" id="L39">    return this;</span>
+  }
+
+  public String getLastName() {
+<span class="nc" id="L43">    return lastName;</span>
+  }
+
+  public UserDTO setLastName(String lastName) {
+<span class="nc" id="L47">    this.lastName = lastName;</span>
+<span class="nc" id="L48">    return this;</span>
+  }
+
+  public String getEmail() {
+<span class="nc" id="L52">    return email;</span>
+  }
+
+  public UserDTO setEmail(String email) {
+<span class="nc" id="L56">    this.email = email;</span>
+<span class="nc" id="L57">    return this;</span>
+  }
+
+  public Set&lt;RoleDTO&gt; getRoles() {
+<span class="nc" id="L61">    return roles;</span>
+  }
+
+  public UserDTO setRoles(Set&lt;RoleDTO&gt; roles) {
+<span class="nc" id="L65">    this.roles = roles;</span>
+<span class="nc" id="L66">    return this;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
