@@ -1,0 +1,72 @@
+version: '3.7'
+
+services:
+  frontend:
+    #mem_limit: 128m
+    #cpus: 0.1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 1m
+
+
+    restart: unless-stopped
+    image: lukschrodt/frontend:latest
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - 8005:80
+
+  backend:
+    #mem_limit: 512M
+    #cpus: 0.2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 1m
+
+    restart: unless-stopped
+    image: lukschrodt/backend:latest
+    container_name: backend
+    ports:
+      - 8090:8080
+    env_file: .env.local
+    depends_on:
+      - db
+
+  db:
+    #mem_limit: 128m
+    #cpus: 0.05
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 1m
+
+    restart: unless-stopped
+    image: 'postgres:10-alpine'
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DB: 'postgres'
+
+  registry:
+    restart: unless-stopped
+    image: registry:2
+    ports:
+      - 5000:5000
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    volumes:
+      - /path/data:/var/lib/registry
+      - /path/certs:/certs
+      - /path/auth:/auth
